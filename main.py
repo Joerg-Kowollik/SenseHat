@@ -4,21 +4,10 @@ import smtplib
 from email.mime.text import MIMEText
 import pickle
 
-filename = 'einstellung'
-n = 1
-m = 0
-sense = SenseHat()
-sense.set_rotation (180)
-sense.clear((0,0,0))
-
-file = open(filename,'rb')
-n = pickle.load(file)
-file.close()
-
 def degree(temperatur, druck, feuchte):
 
     ausgabe = ('Temperatur: %s C ' % str(temperatur) + 'Luftdruck: %s hPa ' % str(druck)+ 'Luftfeuchtigkeit: %s %%' % str(feuchte))
-    #sense.show_message (ausgabe, scroll_speed = 0.1)
+    sense.show_message (ausgabe, scroll_speed = 0.1)
     print (ausgabe)
     sleep(1)
 
@@ -26,7 +15,7 @@ def fahrenheit(temperatur, druck, feuchte):
     
     fahrenheit = round(int(1.8 * temperatur + 32))
     ausgabe = ('Temperatur: %s F ' % str(fahrenheit) + 'Luftdruck: %s hPa ' % str(druck)+ 'Luftfeuchtigkeit: %s %%' % str(feuchte))
-    #sense.show_message (ausgabe, scroll_speed = 0.1)
+    sense.show_message (ausgabe, scroll_speed = 0.1)
     print (ausgabe)
     sleep(1)
     
@@ -50,14 +39,23 @@ def mail(ausgabe):
                 msg_full)
     server.quit()
 
+filename = 'einstellung'
+n = 1
+m = 0
+sense = SenseHat()
+sense.set_rotation (180)
+sense.clear((0,0,0))
+
+file = open(filename,'rb')
+n = pickle.load(file)
+file.close()
+
 while True:
     
     temperatur = round(sense.get_temperature(),1)
     druck = round(sense.get_pressure (), 1)
     feuchte = round(sense.get_humidity (), 1)
-    
-    ausgabe = ('Temperatur: %s C ' % str(temperatur) + 'Luftdruck: %s hPa ' % str(druck)+ 'Luftfeuchtigkeit: %s %%' % str(feuchte))
-    
+        
     for event in sense.stick.get_events():
         if event.action == 'pressed':
             if event.direction == 'up':
@@ -76,9 +74,10 @@ while True:
     pickle.dump (n, file)
     file.close()
     
+    if druck < 950:
+        red = (255,0,0)
+        sense.show_message ('STURM', text_colour = red)
+    
     if druck < 950 and m < 1:
         mail(ausgabe)
         m = m + 1
-
-while True:
-    pass
