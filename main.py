@@ -55,6 +55,8 @@ while True:
     temperatur = round(sense.get_temperature(),1)
     druck = round(sense.get_pressure (), 1)
     feuchte = round(sense.get_humidity (), 1)
+    
+    ausgabe = ('Temperatur: %s C ' % str(temperatur) + 'Luftdruck: %s hPa ' % str(druck)+ 'Luftfeuchtigkeit: %s %%' % str(feuchte))
         
     for event in sense.stick.get_events():
         if event.action == 'pressed':
